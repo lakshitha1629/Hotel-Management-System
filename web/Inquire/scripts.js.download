@@ -1,0 +1,2079 @@
+function _init() {
+    /* loadMenuParentSelect(".header-wrap-top-nav"); // Add class for selected item on Top Navigation
+    loadMenuParentSelect(".header-wrap-main-nav"); // Add class for selected item on Main Navigation
+    lastMenuItems(); // Change Sub Menu Item slide down direction */
+    // smoothScroll(); //Scroll to Title section once click on down arrow at the main slider
+    mobileMenu(".header-wrap-main-nav", "#menu-main-menu"); // Mobile Navigation
+    browserResize("#menu-main-menu"); // This will controll some elements when resizing the browser
+    formSubmitNewsletter(); // Form Submission :: Newsletter
+    browserLoad("#menu-main-menu"); // This will controll some elements after loading the browser
+    megaMenuWidth(); // This will maintain the position of mega menu item
+    sideMenu(); // Side Navigation Drop Down functionality
+    loadGalleryTabs(); // Photo Gallery Tab
+    loadTourTabs(); // Tour Tabs
+    loadFancyboxGallery(); //Load Lightbox for Photo Gallery
+    loadContactTours(); // Append Tour Packages for Contact Form "Tour Name" dropdown
+    loadOffersDropDown(); //Load Offers into Offer Request Form Drop down
+    loadT6Sliders(); // Fancybox Sliders for Template 6 
+
+    tourBookBtn(); // Tours book now button functionality
+
+    custompoup();
+    loadDatepickersIbe();
+    newsletterValidator();
+    /*getTravPaxNationalities();
+    jsonTravPaxLocation("#hotel-destination");
+    jsonTravPaxLocation("#pack-destination");
+    jsonTravPaxSLCities();
+    trasfersWidgetFiels();
+    jsonTravPaxAutoCities("#pick-city", "#pick-type", "#pick-loc", "Pickup Location");
+    jsonTravPaxAutoCities("#drop_city", "#drop-type", "#drop_loc", "Drop Off Location");
+    hotelSearch();
+    tourSearch();
+    packageSearch();
+    transferSearch();*/
+    booknowscrolltop();
+    booknowscrolldowntop();
+    excursionPopupSearch();
+    excursionMultiPopupSearch();  
+    awardsCarousel();
+    teamCarousel();
+
+}
+
+function resizeSideMenuTitleHeight(width) {
+    if (width <= 1024 && 460 <= width) {
+        $('.side-nav-item-title').height($('.sub-navbar-header').height() - 28);
+    } else {
+        $('.side-nav-item-title').height('auto');
+    }
+}
+
+function booknowscrolltop(){
+    if($(".booknowscrolltop a").attr('href') == '') { 
+        $($(".booknowscrolltop a")).click(function(){
+            $('html, body').animate({
+              scrollTop: 0
+          }, 1000);
+        });
+    }
+}
+
+function booknowscrolldowntop(){
+    if($("#booknowscrolldowntop button")) { 
+        $($("#booknowscrolldowntop button")).click(function(){
+            $('html, body').animate({
+              scrollTop: 0
+          }, 1000);
+        });
+    }
+}
+
+// Loading Waypoints in directions for Tour Map Tab
+function loadTourMap() {
+
+    if (tour_map_data.length > 0) {
+
+        var directionsDisplay;
+        var directionsService = new google.maps.DirectionsService();
+        var map;
+
+        directionsDisplay = new google.maps.DirectionsRenderer();
+        var chicago = new google.maps.LatLng(41.850033, -87.6500523);
+        var mapOptions = {
+            zoom: 6,
+            scrollwheel: false,
+            panControl: true,
+            zoomControl: true,
+            scaleControl: true,
+            /*center: chicago*/
+        }
+        map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+        directionsDisplay.setMap(map);
+
+        var start = tour_map_data[0].lat + ',' + tour_map_data[0].long;
+        var end = tour_map_data[(tour_map_data.length - 1)].lat + ',' + tour_map_data[(tour_map_data.length - 1)].long;
+        var waypts = [];
+
+        for (var i = 1; i < (tour_map_data.length - 1); i++) {
+            waypts.push({
+                location: tour_map_data[i].lat + ',' + tour_map_data[i].long,
+                stopover: true
+            });
+        }
+
+        var request = {
+            origin: start,
+            destination: end,
+            waypoints: waypts,
+            optimizeWaypoints: true,
+            travelMode: google.maps.TravelMode.DRIVING
+        };
+
+        directionsService.route(request, function(response, status) {
+            if (status == google.maps.DirectionsStatus.OK) {
+                directionsDisplay.setDirections(response);
+                var route = response.routes[0];
+                /*var summaryPanel = document.getElementById('directions_panel');
+                summaryPanel.innerHTML = '';
+                // For each route, display summary information.
+                for (var i = 0; i < route.legs.length; i++) {
+                    var routeSegment = i + 1;
+                    summaryPanel.innerHTML += '<b>Route Segment: ' + routeSegment + '</b><br>';
+                    summaryPanel.innerHTML += route.legs[i].start_address + ' to ';
+                    summaryPanel.innerHTML += route.legs[i].end_address + '<br>';
+                    summaryPanel.innerHTML += route.legs[i].distance.text + '<br><br>';
+                }*/
+            }
+        });
+    }
+}
+
+// Fancybox Sliders for Template 6 
+function loadT6Sliders() {
+    if ($('.t6-slider-cont-wrap').length > 0) {
+        $('.t6-slider-cont-wrap').flexslider({
+            animation: "fade", //String: Select your animation type, "fade" or "slide"
+            easing: "swing",
+            minItems: 1,
+            maxItems: 0,
+            controlNav: false,
+            directionNav: true,
+            move: 0,
+            slideshow: true,
+            slideshowSpeed: 3000, //Integer: Set the speed of the slideshow cycling, in milliseconds
+            animationSpeed: 1000,
+            pauseOnHover: true,
+            touch: true
+        });
+    }
+
+    if ($('.t6-img-wrap').length > 0) {
+        $('.t6-img-wrap').flexslider({
+            animation: "slide",
+            controlNav: "thumbnails",
+            slideshowSpeed: 3000, //Integer: Set the speed of the slideshow cycling, in milliseconds
+            animationSpeed: 1000,
+            pauseOnHover: false,
+            animationLoop: false,
+            pauseOnAction: false,
+            start: function() {
+                $('.flex-images').show();
+            },
+        });
+    }
+
+}
+
+function hamburgerdrop(elemclick, target) {
+    $(elemclick).click(function() {
+        /* toggle hamburger */
+        $(this).toggleClass('open');
+        $(target).toggleClass('expand').stop(true, true).animate({
+            left: "toggle",
+            opacity: "toggle"
+        }, 300);
+    })
+}
+
+
+/* if the desktop menu is a hamburger by default  - use hamburgerdropdesktop() else hamburgerdrop() */
+function hamburgerdropdesktop(elemclick, target) {
+    if (elemclick.length) {
+        $(elemclick).click(function(e) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            /* toggle expanded target */
+            $('.expand').map(function(index) {
+                if ($(this)[0] !== $(target)[0]) {
+                    $(this).toggleClass('expand').stop(true, true).animate({
+                        top: "toggle",
+                        opacity: "toggle"
+                    }, 300);
+                }
+            });
+            /* toggle open elemclick */
+            $('.open').map(function(index) {
+                if ($(this)[0] !== $(elemclick)[0]) {
+                    $(this).toggleClass('open');
+                }
+            });
+
+            /* toggle hamburger */
+            $(this).toggleClass('open');
+            $(target).toggleClass('expand').stop(true, true).animate({
+                top: "toggle",
+                opacity: "toggle"
+            }, 300);
+        });
+    }
+    /* not target click handle */
+    $(document).click(function(e) {
+        if ($(target).is(":visible") && !$(target).is(e.target)) {
+            $(elemclick).toggleClass('open');
+            $(target).toggleClass('expand').stop(true, true).animate({
+                top: "toggle",
+                opacity: "toggle"
+            }, 300);
+        }
+    });
+    /* stop propagation */
+    $(target).click(function(e) {
+        e.stopPropagation();
+    });
+}
+
+// Make a custom popup
+function custompoup() {
+    $("#bookingWig .tapbook .rowtap").on('click', function() {
+        $(".tapbook .rowtap").removeClass('active');
+        $(this).addClass('active');
+
+        // Change tab panel data 
+        var dataID = $(this).attr('data-id');
+        $("#bookingWig .tappanel .paneldata").removeClass('active');
+        $("#bookingWig .tappanel").find("#" + dataID).addClass('active');
+
+        var windowWidth = $(window).width();
+        if (windowWidth <= 1024) {
+            var windowHeight = $(window).height();
+            $("#bookingWig").addClass('activetab');
+            $('#main_slider').css("overflow", "visible");
+        } else {
+            var bookingHeight = $("#bookingWig").height();
+        }
+    });
+
+    // append div structure
+    var strchildage = '<div class="incrementinputholder clearfix inputholder">' +
+    '<label>Child Age (yrs)</label>' +
+    '<span class="minus button">-</span>' +
+    '<input class="incrementinput" type="text" value="0">' +
+    '<span class="plus button">+</span>' +
+    '</div>';
+
+    var strroom = '<div class="prow prowdynamic clearfix">' +
+    '<div class="item">' +
+    '<div class="incrementinputholder clearfix inputholder">' +
+    ' <label>Adults (12+yrs)</label>' +
+    '<span class="minus button">-</span>' +
+    '<input class="incrementinput hotel-adult" type="text" value="0">' +
+    '<span class="plus button">+</span>' +
+    '</div>' +
+    '</div>' +
+    '<div class="item children">' +
+    '<div class="incrementinputholder clearfix inputholder">' +
+    '<label>Children (0-12)</label>' +
+    ' <span class="minus button">-</span>' +
+    '<input class="incrementinput hotel-child" type="text" value="0">' +
+    '<span class="plus button">+</span>' +
+    '</div>' +
+    '</div>' +
+    '<div class="item childageholder">' +
+    '</div>' +
+    '</div>';
+
+    hamburgerdrop('.people', '.peoplewrap');
+    //hamburgerdrop('.trav-ok-btn', '.peoplewrap');
+    hamburgerdrop('#pick-time', '.timepicker_wrap ');
+
+    // adding room row
+    $('.addaroom').click(function(e) {
+        e.preventDefault(), $(strroom).appendTo($(this).siblings('.prowwrap'));
+    });
+    // remove room row
+    $('.removeroom').click(function(e) {
+        e.preventDefault(), $(this).siblings('.prowwrap').find('.prowdynamic:last-of-type').remove();
+    });
+
+    $(document).on('click', '.button', function(event) {
+        var $button = $(this);
+        var oldValue = $button.parent().find("input").val();
+
+        if ($button.text() == "+") {
+            var newVal = parseFloat(oldValue) + 1;
+            // show child age
+            /*if ($button.parents('.children').length) {
+                $(strchildage).appendTo($button.parents('.children').next());
+            }*/
+
+        } else {
+            // Don't allow decrementing below zero
+            if (oldValue > 0) {
+                var newVal = parseFloat(oldValue) - 1;
+            } else {
+                newVal = 0;
+            }
+            if ($button.parents('.children').length) {
+                $($button.parents('.children').next()).find('.incrementinputholder:nth-child(' + oldValue + ')').remove();
+            }
+
+        }
+
+        $button.parent().find("input").attr('value', newVal);
+    });
+
+    // Show count after click ok button on travelers popup
+    $(".trav-ok-btn").click(function(event) {
+        var adlt = 0;
+        var chld = 0;
+        $(this).parent().find('.prowwrap .prow .item .inputholder input.hotel-adult').each(function() {
+            var type = $(this).attr("type");
+            if ((type == "text")) {
+                adlt += parseInt($(this).val());
+                chld += parseInt($(this).parent().parent().next().find(".hotel-child").val());
+            }
+        });
+        $(this).parent().parent().find(".people").text( adlt + " Adults / " +  chld + " Children " );
+    });
+    hamburgerdrop('.trav-ok-btn', '.peoplewrap');
+
+    // Show count after click ok Travelers field on travelers popup
+    $(".paneldata .people").click(function(event) {
+       var adlt = 0;
+       var chld = 0;
+       $(this).next().find('.prowwrap .prow .item .inputholder input.hotel-adult').each(function() {
+           var type = $(this).attr("type");
+           if ((type == "text")) {
+               adlt += parseInt($(this).val());
+               chld += parseInt($(this).parent().parent().next().find(".hotel-child").val());
+           }
+       });
+       $(this).text( adlt + " Adults / " +  chld + " Children " );
+   });
+}
+
+
+/*Load Tours Items into Contact Us Drop down*/
+function loadContactTours() {
+    if ($("#tour_name").length > 0) {
+        $("#tour_name").append(tour_data);
+    }
+}
+
+/*Load Offers into Offer Request Form Drop down*/
+function loadOffersDropDown() {
+    if ($("#offer_name").length > 0) {
+        $("#offer_name").append(offer_data);
+    }
+}
+
+//Load Lightbox for Photo Gallery
+function loadFancyboxGallery() {
+    if ($(".gal-item-link").length > 0) {
+        $(".gal-item-link").fancybox({
+            scrolling: 'hidden',
+            helpers: {
+                overlay: {
+                    locked: false
+                }
+            }
+        });
+    }
+}
+
+
+// Photo Gallery Tab
+function loadGalleryTabs() {
+
+    $(".gal-cat-wrap .gal-cat-item a").click(function(e) {
+        e.preventDefault();
+        //Retrive Category ID & unique item ID
+        var cat_id = $(this).data("options").cat_id;
+        var cat_name = $(this).data("options").cat_name;
+
+        $(".gal-cat-wrap .gal-cat-item a").removeClass('selected');
+        $(this).addClass('selected');
+
+        $('.gal-item-group').hide();
+        $('.gal-group-' + cat_id).fadeIn(500);
+
+        $('.gal-cat-mobile-drop').html(cat_name);
+    });
+
+    /*Mobile Version*/
+    $(".gal-cat-mobile-drop").click(function() {
+        $(this).toggleClass("fold expand");
+        $(".gal-cat-wrap").slideToggle("fast", function() {});
+    });
+}
+
+//Tour Tabs
+function loadTourTabs() {
+
+    $(".tour-cat-wrap .tour-cat-item a").click(function(e) {
+        e.preventDefault();
+        //Retrive Category ID & unique item ID
+        var cat_id = $(this).data("options").cat_id;
+        var cat_name = $(this).data("options").cat_name;
+
+        $(".tour-cat-wrap .tour-cat-item a").removeClass('selected');
+        $(this).addClass('selected');
+
+        $('.tour-item-group').hide();
+        $('.tour-group-' + cat_id).fadeIn(500);
+
+        $('.tour-cat-mobile-drop').html(cat_name);
+
+        if (cat_id == 2) {
+            loadTourMap();
+        }
+
+    });
+
+    /*Mobile Version*/
+    $(".tour-cat-mobile-drop").click(function() {
+        $(this).toggleClass("fold expand");
+        $(".tour-cat-wrap").slideToggle("fast", function() {});
+    });
+
+}
+
+
+// This will maintain the position of mega menu item
+function megaMenuWidth() {
+
+    var myWidth = 0,
+    myHeight = 0;
+    if (typeof(window.innerWidth) == 'number') {
+        myWidth = window.innerWidth;
+        myHeight = window.innerHeight;
+    } else if (document.documentElement && (document.documentElement.clientWidth || document.documentElement.clientHeight)) {
+        myWidth = document.documentElement.clientWidth;
+        myHeight = document.documentElement.clientHeight;
+    } else if (document.body && (document.body.clientWidth || document.body.clientHeight)) {
+        myWidth = document.body.clientWidth;
+        myHeight = document.body.clientHeight;
+    }
+
+    //Mega Menu - Tour Packages
+    if (myWidth >= 1250) {
+        $("#tours_mmenu_id").css("width", myWidth - 30 + 'px');
+
+        var leftVal = (myWidth - $('.header-wrap-main-nav-wrap').width()) + 23;
+        $("#tours_mmenu_id").css("left", '-' + leftVal + 'px');
+
+    } else if (myWidth >= 995) {
+        $("#tours_mmenu_id").css("width", myWidth - 30 + 'px');
+
+        var p = $('.header-wrap-main-nav-wrap ul li:first-child');
+        var offset = p.offset();
+
+        var leftVal = offset.left + 55;
+        $("#tours_mmenu_id").css("left", '-' + leftVal + 'px');
+        $("#tours_mmenu_id").css("top", '45px');
+
+    }
+}
+
+
+// Form Submission :: Newsletter
+function formSubmitNewsletter() {
+    $(".newsletter-but").click(function(e) {
+        e.preventDefault();
+
+        var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+        var errcount = 0;
+        $(".news-msg").html("Adding email address...").fadeIn(500).delay(3e3).fadeOut(500);
+
+        var _email = $("#param_email").val();
+        if (_email.search(reg) == -1) {
+            $(".news-msg").html("Enter Valid Email");
+            ++errcount;
+        }
+        if (errcount == 0) {
+            var mailchimpurl = "http://walkerstours.us5.list-manage2.com/subscribe?u=e197d4d15778d029808a60fc1&id=a6437806a2&MERGE0=" + _email + "";
+            window.open(mailchimpurl, '_blank');
+        }
+        return false;
+
+        /*        var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+
+                var email = $("#param_email").val().trim();
+
+                if(email==''){
+                    $('.msgbox_newsletter').html('You can not left email address blank').fadeIn().delay(5000).fadeOut();
+                }else if (reg.test(email) == false) {
+                    $('.msgbox_newsletter').html('Please enter a valid email address').fadeIn().delay(5000).fadeOut();
+                }else{
+                    data = {
+                        action: 'validate_newsletter',
+                        value : email
+                    };
+                    $.post( ajaxurl, data, function( response ) {
+                        if( response ) {
+                            if(response == 1){
+                                jQuery('.msgbox_newsletter').html('Email Address is already subscribed').fadeIn().delay(5000).fadeOut();
+                            }else{ 
+                                jQuery('#newsletter-form').submit();
+                            }
+                        } else {
+                            jQuery('.msgbox_newsletter').html('Try again latter').fadeIn().delay(5000).fadeOut();
+                        }
+                    });
+                }*/
+
+            });
+}
+
+
+// Home Page Tour Collection Slider
+function tourCollection() {
+
+    //Button Action Next Page
+    $(".tour-def-controles ul li a.tour-cont-rgt").click(function(e) {
+        e.preventDefault();
+
+        var totPages = 0;
+        totPages = Math.ceil(parseInt($("#tour_collec_count").val()) / 3);
+
+        var currentPage = parseInt($("#tour_collec_current").val());
+        var nextPage = parseInt($("#tour_collec_current").val()) + 1;
+
+        if ($("#tour_collec_current").val() >= 1 && $("#tour_collec_current").val() < totPages) {
+            $(".tour-item-call-1").html($(".tour-item-block-" + nextPage + "__1").html());
+            $(".tour-item-call-2").html($(".tour-item-block-" + nextPage + "__2").html());
+            $(".tour-item-call-3").html($(".tour-item-block-" + nextPage + "__3").html());
+
+            //Div Animation
+            var unitDivHeight = $(".tour-item-call-1").height();
+
+            $(".tour-item-call-1, .tour-item-call-2, .tour-item-call-3").css("left", "auto");
+            $(".tour-item-call-1, .tour-item-call-2, .tour-item-call-3").css("top", "auto");
+
+            $(".tour-item-call-1").animate({
+                left: (unitDivHeight) + 'px',
+                top: unitDivHeight + 'px'
+            }, 500);
+            $(".tour-item-call-2").animate({
+                left: '0px',
+                top: '-' + unitDivHeight + 'px'
+            }, 500);
+            $(".tour-item-call-3").animate({
+                left: '-' + (unitDivHeight) + 'px',
+                top: '0px'
+            }, 500);
+
+            $("#tour_collec_current").val(nextPage);
+        } else {
+
+            //If Item finished, it will start fom the begining
+            $("#tour_collec_current").val('1');
+
+            var totPages = 0;
+            totPages = Math.ceil(parseInt($("#tour_collec_count").val()) / 3);
+
+            var currentPage = parseInt($("#tour_collec_current").val());
+
+            if ($("#tour_collec_current").val() >= 1 && $("#tour_collec_current").val() < totPages) {
+                $(".tour-item-call-1").html($(".tour-item-block-" + currentPage + "__1").html());
+                $(".tour-item-call-2").html($(".tour-item-block-" + currentPage + "__2").html());
+                $(".tour-item-call-3").html($(".tour-item-block-" + currentPage + "__3").html());
+
+                //Div Animation
+                var unitDivHeight = $(".tour-item-call-1").height();
+
+                $(".tour-item-call-1, .tour-item-call-2, .tour-item-call-3").css("left", "auto");
+                $(".tour-item-call-1, .tour-item-call-2, .tour-item-call-3").css("top", "auto");
+
+                $(".tour-item-call-1").animate({
+                    left: (unitDivHeight) + 'px',
+                    top: unitDivHeight + 'px'
+                }, 500);
+                $(".tour-item-call-2").animate({
+                    left: '0px',
+                    top: '-' + unitDivHeight + 'px'
+                }, 500);
+                $(".tour-item-call-3").animate({
+                    left: '-' + (unitDivHeight) + 'px',
+                    top: '0px'
+                }, 500);
+
+                $("#tour_collec_current").val(currentPage);
+            }
+        }
+    });
+
+    //Button Action Previous Page
+    $(".tour-def-controles ul li a.tour-cont-lft").click(function(e) {
+        e.preventDefault();
+
+        var totPages = 0;
+        totPages = Math.ceil(parseInt($("#tour_collec_count").val()) / 3);
+
+        var currentPage = parseInt($("#tour_collec_current").val());
+        var prevPage = parseInt($("#tour_collec_current").val()) - 1;
+
+        if (prevPage >= 1 && $("#tour_collec_current").val() <= totPages) {
+            $(".tour-item-call-1").html($(".tour-item-block-" + prevPage + "__1").html());
+            $(".tour-item-call-2").html($(".tour-item-block-" + prevPage + "__2").html());
+            $(".tour-item-call-3").html($(".tour-item-block-" + prevPage + "__3").html());
+
+            //Div Animation
+            var unitDivHeight = $(".tour-item-call-1").height();
+
+            $(".tour-item-call-1, .tour-item-call-2, .tour-item-call-3").css("left", "auto");
+            $(".tour-item-call-1, .tour-item-call-2, .tour-item-call-3").css("top", "auto");
+
+            $(".tour-item-call-1").animate({
+                left: (unitDivHeight) + 'px',
+                top: unitDivHeight + 'px'
+            }, 500);
+            $(".tour-item-call-2").animate({
+                left: '0px',
+                top: '-' + unitDivHeight + 'px'
+            }, 500);
+            $(".tour-item-call-3").animate({
+                left: '-' + (unitDivHeight) + 'px',
+                top: '0px'
+            }, 500);
+            $("#tour_collec_current").val(prevPage);
+        } else {
+
+            //If Item finished, it will start fom the begining
+            var totPages = 0;
+            totPages = Math.ceil(parseInt($("#tour_collec_count").val()) / 3);
+
+            $("#tour_collec_current").val(totPages);
+
+            var currentPage = parseInt($("#tour_collec_current").val());
+
+            if ($("#tour_collec_current").val() >= 1 && $("#tour_collec_current").val() < totPages) {
+                $(".tour-item-call-1").html($(".tour-item-block-" + currentPage + "__1").html());
+                $(".tour-item-call-2").html($(".tour-item-block-" + currentPage + "__2").html());
+                $(".tour-item-call-3").html($(".tour-item-block-" + currentPage + "__3").html());
+
+                //Div Animation
+                var unitDivHeight = $(".tour-item-call-1").height();
+
+                $(".tour-item-call-1, .tour-item-call-2, .tour-item-call-3").css("left", "auto");
+                $(".tour-item-call-1, .tour-item-call-2, .tour-item-call-3").css("top", "auto");
+
+                $(".tour-item-call-1").animate({
+                    left: (unitDivHeight) + 'px',
+                    top: unitDivHeight + 'px'
+                }, 500);
+                $(".tour-item-call-2").animate({
+                    left: '0px',
+                    top: '-' + unitDivHeight + 'px'
+                }, 500);
+                $(".tour-item-call-3").animate({
+                    left: '-' + (unitDivHeight) + 'px',
+                    top: '0px'
+                }, 500);
+
+                $("#tour_collec_current").val(currentPage);
+            }
+        }
+    });
+
+    //Default Load Action
+    $(document).ready(function() {
+
+        $("#tour_collec_current").val(1);
+
+        var totPages = 0;
+        totPages = Math.ceil(parseInt($("#tour_collec_count").val()) / 3);
+
+        var currentPage = parseInt($("#tour_collec_current").val());
+
+        if ($("#tour_collec_current").val() >= 1 && $("#tour_collec_current").val() < totPages) {
+            $(".tour-item-call-1").html($(".tour-item-block-" + currentPage + "__1").html());
+            $(".tour-item-call-2").html($(".tour-item-block-" + currentPage + "__2").html());
+            $(".tour-item-call-3").html($(".tour-item-block-" + currentPage + "__3").html());
+            $("#tour_collec_current").val(currentPage);
+        }
+
+        //Automatically rotate
+        //$( "button:first" ).trigger( "click" );
+        setInterval(function() {
+            $(".tour-def-controles ul li a.tour-cont-rgt").click();
+        }, 4000);
+
+    });
+
+}
+
+//Mobile menu function
+function mobileMenu(classname, menuid) {
+    $(classname + " ul > li").each(function() {
+        $(this).has("ul").addClass("menu-parent").append("<span class='expand dropdwn-btn'></span>");
+    });
+    $(classname + " nav .mobilemenu-wrapper .mobile-icon").click(function() {
+        $(classname + " nav .mobilemenu").slideToggle("fast", function() {});
+    });
+
+    $(classname + " li .dropdwn-btn").click(function() {
+        var current_submenu = $(this).parent().children("ul");
+        $(this).toggleClass("fold expand");
+        $(current_submenu).slideToggle("fast", function() {});
+    });
+
+    $(menuid).mouseleave(function() {
+        $(menuid + " ul").removeAttr("style");
+        $(".dropdwn-btn").addClass("expand");
+        $(".dropdwn-btn").removeClass("fold");
+    });
+}
+
+//Side menu function
+function sideMenu() {
+    $(".menu-side-menu-container").click(function(e) {
+        $(this).find('.sub-icon-bar').toggleClass("fold expand");
+        $(this).find(".child").slideToggle("fast");
+    });
+}
+
+//Function starts when browser Resize
+function browserResize(menuid) {
+    $(window).on('resize', function() {
+        var windowheight = $(window).height();
+        var windowWidth = $(window).width();
+
+        var winWidthRes = $(window).width();
+        if (winWidthRes <= 977) {
+            $(menuid).addClass("mobilemenu");
+            $(menuid).css("display", "none");
+            $(".mobilemenu-wrapper").css("display", "block");
+        } else {
+            $(menuid).removeClass("mobilemenu");
+            $(menuid).css("display", "block");
+            $(".mobilemenu-wrapper").css("display", "none");
+        }
+
+        //Home Page - Tour Packages
+        $(".tour-item.default").height($(".tour-item-call-1").height());
+        $(".tour-item-lg").height(($(".tour-item-call-1").height() * 2));
+
+        $(".tour-item-call-1, .tour-item-call-2, .tour-item-call-3").css("left", "auto");
+        $(".tour-item-call-1, .tour-item-call-2, .tour-item-call-3").css("top", "auto");
+
+        //Tour Packages   
+      /*  if ($(window).width() >= 1100) {
+            $('.t2-wrap-item-rgt').height($('.t2-wrap-item-img').height() + 5);
+        } else {
+            $('.t2-wrap-item-rgt').css('height', 'auto');
+        }*/
+        $('.t2-wrap-item-link').show('fast');
+
+        megaMenuWidth();
+
+        /*Image Gallery*/
+        if (winWidthRes <= 480) {
+            $(".gal-cat-wrap").hide();
+            $('.gal-cat-mobile-drop').removeClass('expand').addClass('fold');
+
+            $(".gal-cat-wrap .gal-cat-item a").click(function(e) {
+                e.preventDefault();
+
+                if ($(window).width() <= 480) {
+                    $(".gal-cat-wrap").hide();
+                }
+
+                if ($('.gal-cat-mobile-drop').hasClass("expand")) {
+                    $('.gal-cat-mobile-drop').removeClass('expand').addClass('fold');
+                } else {
+                    $('.gal-cat-mobile-drop').removeClass('fold').addClass('expand');
+                }
+
+            });
+        } else {
+            $(".gal-cat-wrap").show();
+            $('.gal-cat-mobile-drop').removeClass('expand').addClass('fold');
+        }
+
+        // resizeSideMenuTitleHeight($(window).width());
+
+        /*Home Facebook Widget*/
+        if (winWidthRes >= 1100) {
+            $('.facebook-wrap-inner').height($('.featured-link-item').height());
+        } else {
+            $('.facebook-wrap-inner').height('auto').css('background-color', '');
+        }
+    });
+}
+
+//Function starts when browser loading
+function browserLoad(menuid) {
+    $(window).load(function() {
+
+        // revamp
+        /*excursion carousel */
+        excursionCarousel();
+        /* smart menu */
+        if ($('#main-menu').length) {
+            $("#main-menu").smartmenus().bind("click.smapi", function(e, t) {
+                var n = $(this).data("smartmenus");
+                if (n.isCollapsible()) {
+                    var i = $(t);
+                    o = i.dataSM("sub");
+                    if (o && !o.is(":visible")) return n.itemActivate(i, !0), !1
+                }
+        });
+        }
+        /* hamburger menu toggle */
+        if ($('.menu-toggle').length) {
+            $('.menu-toggle').click(function() {
+                $(this).toggleClass('open');
+            });
+        }
+
+        if ($('.menu-toggle').length) {
+            $('.menu-toggle').click(function() {
+                $(this).toggleClass('open');
+            });
+        }
+
+        // $('.parent').imagefill();
+
+        var menuid = '#menu-main-menu';
+        var winWidthRes = $(window).width();
+        if (winWidthRes <= 977) {
+            $(menuid).addClass("mobilemenu");
+            $(menuid).css("display", "none");
+            $(".mobilemenu-wrapper").css("display", "block");
+        } else {
+            $(menuid).removeClass("mobilemenu");
+            $(menuid).css("display", "block");
+            $(".mobilemenu-wrapper").css("display", "none");
+        }
+
+
+        //Home Page - Tour Packages
+        $(".tour-item.default").height($(".tour-item-call-1").height());
+        $(".tour-item-lg").height(($(".tour-item-call-1").height() * 2));
+
+        //Tour Packages
+       /* if ($(window).width() >= 1100) {
+            $('.t2-wrap-item-rgt').height($('.t2-wrap-item-img').height() - 2);
+        }*/
+        $('.t2-wrap-item-link').fadeIn('slow');
+
+        megaMenuWidth();
+
+        /*Image Gallery*/
+        if (winWidthRes <= 480) {
+
+            $(".gal-cat-wrap .gal-cat-item a").click(function(e) {
+                e.preventDefault();
+                $(".gal-cat-wrap").hide();
+            });
+
+        } else {
+            $(".gal-cat-wrap").show();
+            $('.gal-cat-mobile-drop').removeClass('expand').addClass('fold');
+        }
+
+        $(".gal-cat-wrap .gal-cat-item:first-child a").trigger('click');
+
+        /*Tours*/
+        $(".tour-cat-wrap .tour-cat-item:first-child a").trigger('click');
+
+
+        // resizeSideMenuTitleHeight($(window).width());
+
+        /*Home Facebook Widget*/
+        if (winWidthRes >= 1100) {
+            $('.facebook-wrap-inner').height($('.featured-link-item').height());
+        } else {
+            $('.facebook-wrap-inner').height('auto').css('background-color', '');
+
+        }
+
+        $('#newsletter-form').on('keyup keypress', function(e) {
+            var code = e.keyCode || e.which;
+            if (code == 13) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+    });
+}
+
+$(window).load(function(e){
+
+    // loadDatepickers();
+$('.datepick').datepicker({
+            minDate: 0,
+            // ...
+        });
+    
+    /* facelift menu */
+    /* main navigation */
+    hamburgerdropdesktop('.mainmenutoggle', '.main-menu-container');
+    hamburgerdrop('.footermenutoggle', '.footer-menu');
+
+    /* create var */
+    var html = "";
+    var video = "";
+    var vids = [];
+    var player = [];
+    var description = "";
+    var linkurl = "";
+    var target = "";
+    /* ---------- array check & create html slides - responsive ---------- */
+    if (typeof imageArray != 'undefined') {
+        for (var i = 1; i < imageArray.length; i++) {
+
+            if (imageArray[i]['link']) {
+                link = '<a href="'+imageArray[i]['link']+'">';
+                endlink = '</a>';
+            }else{
+                link = '';
+                endlink = '';
+            }
+
+            html += '<div class="item">' + 
+            '<picture>' +
+            '<source media="(max-width: 768px)" srcset="' + imageArray[i]['img'] + '">' +
+            link +
+            '<img class="img-responsive" src="' + imageArray[i]['img'] + '" alt="' + imageArray[i]['alt'] + '" title="' + imageArray[i]['title'] + '">' +
+            endlink +
+            '</picture>' + 
+            '</div>';
+        }
+    }
+
+    /* Main carousel args */
+
+    args = {
+        items: 1,
+        autoplay: !0,
+        loop: !0,
+        dots: !1,
+        nav:true,
+        navText: ['<svg xmlns="http://www.w3.org/2000/svg" width="15.031" height="38" viewBox="0 0 15.031 38"><path id="slider_arrow_left.svg" class="cls-1" d="M20.2,108.235L33.633,90.3a0.671,0.671,0,0,1,1.14,0,1.339,1.339,0,0,1,0,1.522L21.914,108.992l12.859,17.167a1.339,1.339,0,0,1,0,1.522,0.726,0.726,0,0,1-.567.318,0.7,0.7,0,0,1-.567-0.318L20.207,109.749A1.337,1.337,0,0,1,20.2,108.235Z" transform="translate(-20 -90)"/></svg>','<svg xmlns="http://www.w3.org/2000/svg" width="14.969" height="38" viewBox="0 0 14.969 38"><path id="slider_arrow_right.svg" class="cls-1" d="M57.768,108.235L44.365,90.3a0.669,0.669,0,0,0-1.137,0,1.341,1.341,0,0,0,0,1.522l12.832,17.167L43.227,126.159a1.341,1.341,0,0,0,0,1.522,0.724,0.724,0,0,0,.566.318,0.7,0.7,0,0,0,.566-0.318l13.4-17.932A1.339,1.339,0,0,0,57.768,108.235Z" transform="translate(-43 -90)"/></svg>'],
+        animateOut: "fadeOut"
+    }
+    /* init slider */
+    if ($('#eme-slider').length) {
+        $('#eme-slider').append(html).owlCarousel(args);
+    }
+
+});
+
+
+function smoothScroll() {
+    $(document).ready(function() {
+        $('a.scroll-bottom').on('click', function(e) {
+            e.preventDefault();
+
+            var target = this.hash;
+            var $target = $(target);
+
+            $('html, body').stop().animate({
+                'scrollTop': $target.offset().top
+            });
+        });
+    });
+}
+
+// Add class for selected item on navigation
+function loadMenuParentSelect(wrapper) {
+    $(document).find(wrapper + " ul > li").each(function(index, element) {
+        $(this).find("ul li.selected").parents().parents().addClass("selected");
+    });
+}
+
+// Change Sub Menu Item slide down direction
+function lastMenuItems() {
+    /* Topmenu list last submenu position*/
+    if ($('.header-wrap-main-nav ul#menu-main-menu > li').length > 5) {
+        $('.header-wrap-main-nav ul#menu-main-menu > li').slice(-5).addClass('posright');
+    }
+
+    $('.header-wrap-main-nav ul > li:has(> ul)').addClass('haschild')
+}
+
+//Google Translator
+function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+        autoDisplay: false
+    }, 'google_translate_element');
+}
+
+
+//Load Google map for Contact oage
+function loadGoogleMap() {
+
+    var stockholm = new google.maps.LatLng(mapLatitude, mapLongitude);
+    var parliament = new google.maps.LatLng(mapLatitude, mapLongitude);
+    var marker;
+    var map;
+    var infowindow;
+    var contentString;
+    var icon = _tplDir + 'images/mapdistance-icon.png';
+
+    function initialize() {
+
+        // Create an array of styles.
+        var styles = [{
+            featureType: "all",
+            stylers: [{
+                "visibility": "on"
+            }, {
+                "saturation": -100
+            }]
+        }, {
+            featureType: "road.arterial",
+            elementType: "geometry",
+            stylers: [{
+                "visibility": "on"
+            }, {
+                "saturation": -100
+            }]
+        }, {
+            featureType: "poi.business",
+            elementType: "labels",
+            stylers: [{
+                "visibility": "on"
+            }, {
+                "saturation": -100
+            }]
+        }];
+
+        // Create a new StyledMapType object, passing it the array of styles,
+        // as well as the name to be displayed on the map type control.
+        var styledMap = new google.maps.StyledMapType(styles, {
+            name: blog_name
+        });
+
+        var mapOptions = {
+            zoom: parseInt(mapZoomLevel),
+            scrollwheel: false,
+            panControl: true,
+            zoomControl: true,
+            scaleControl: true,
+            mapTypeControlOptions: {
+                mapTypeIds: [google.maps.MapTypeId.mapType, 'map_style']
+            },
+            center: stockholm
+        };
+
+        map = new google.maps.Map(document.getElementById(mapCanvasLocation),
+            mapOptions);
+
+        //Associate the styled map with the MapTypeId and set it to display.
+        map.mapTypes.set('map_style', styledMap);
+        map.setMapTypeId('map_style');
+
+        marker = new google.maps.Marker({
+            map: map,
+            draggable: false,
+            scrollwheel: false,
+            animation: google.maps.Animation.DROP,
+            position: parliament,
+            icon: icon
+        });
+        //google.maps.event.addListener(marker, 'click', toggleBounce);
+    }
+
+    google.maps.event.addDomListener(window, 'load', initialize);
+};
+
+
+//Display Browser resolution for debuging perposses
+function displayWindowSize() {
+    var myWidth = 0,
+    myHeight = 0;
+    if (typeof(window.innerWidth) == 'number') {
+        myWidth = window.innerWidth;
+        myHeight = window.innerHeight;
+    } else if (document.documentElement && (document.documentElement.clientWidth || document.documentElement.clientHeight)) {
+        myWidth = document.documentElement.clientWidth;
+        myHeight = document.documentElement.clientHeight;
+    } else if (document.body && (document.body.clientWidth || document.body.clientHeight)) {
+        myWidth = document.body.clientWidth;
+        myHeight = document.body.clientHeight;
+    }
+
+    if ($('#resolution').length > 0) {
+        document.getElementById("resolution").innerHTML = myWidth + "x" + myHeight;
+    }
+};
+
+// Tours booknow button scroll or linked functionality
+function tourBookBtn() {
+    $('.t3_booknow a').click(function(event) {
+        if ($(this).attr('href') == '') {
+            var target = $('#bookingWig');
+            $('html, body').animate({
+                scrollTop: target.offset().top-100
+            }, 600);
+            return false;
+        }
+    });
+}
+
+
+function loadDatepickersIbe(){
+    var nowTemp = new Date();
+    var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
+
+    var checkin = $("#hotel-checkin , #tour-start-date , #trans-date , #pack-date").datepicker({
+        format : "dd-mm-yyyy",
+        onRender: function(date) {
+            return date.valueOf() < now.valueOf() ? "disabled" : "";
+        }
+    }).on("changeDate", function(ev) {
+        if (ev.date.valueOf() >= checkout.date.valueOf()) {
+            var newDate = new Date(ev.date);
+            newDate.setDate(newDate.getDate() + 1);
+            checkout.setValue(newDate);
+        }
+        checkin.hide();
+        $("#param_ibe_nights").val( pad('1') );
+        $("#hotel-checkout")[0].focus();
+    }).data("datepicker");
+
+    
+    var checkout = $("#hotel-checkout").datepicker({
+        format : "dd-mm-yyyy",
+        onRender: function(date) { 
+            return date.valueOf() < checkin.date.valueOf() ? "disabled" : "";
+        }
+    }).on("changeDate", function(ev) {
+        var ciDate  = $("#hotel-checkin").val();
+        var coDate  = ev.date;
+        
+        var nigts = daydiff(parseDate( ciDate ), coDate);
+
+        $("#param_ibe_nights").val( pad(nigts) );
+
+        checkout.hide();
+    }).data("datepicker");
+
+    $("#param_ibe_nights").keyup(function() {
+        var nights = $(this).val();
+        if (nights == 0) {
+            nights = 1;
+            $("#param_ibe_nights").mouseout(function() {
+                var nights;
+                if ($("#param_ibe_nights").val() > 1) {
+                    nights = pad($("#param_ibe_nights").val())
+                } else {
+                    nights = "01"
+                }
+                $("#param_ibe_nights").val(nights)
+            })
+        }
+
+        if (nights != "") {
+            var ciDate  = $("#hotel-checkin").val();
+            var coDate  = $("#hotel-checkout").val();
+
+            if( ciDate!='' ){ 
+
+                var newDate = parseDate(ciDate);
+                newDate.setDate(newDate.getDate() + parseInt(nights) );
+                checkout.setValue(newDate);
+
+            }
+            checkin.hide();
+        }
+    });
+}
+
+//Show a leading zero if a number is less than 10
+function pad(n) {
+    return (n < 10) ? ("0" + n) : n;
+}
+
+//get the number of days between two dates
+function parseDate(str) {
+    var mdy = str.split('-');
+    return new Date(mdy[2], mdy[1] - 1, mdy[0]);
+}
+
+//get the number of days between two dates
+function daydiff(first, second) {
+    return Math.round((second-first)/(1000*60*60*24));
+}
+
+
+// TravPax Booking Widget
+
+function jsonTravPaxLocation(fieldid){
+
+    $( fieldid ).autocomplete({ 
+        source: function( request, response ) { 
+            $.ajax({ 
+                url: ajaxurl, 
+                type: "POST",
+                dataType: "json", 
+                data: {
+                    action: 'json_travpax_location',
+                    loc : request.term
+                },
+                success: function (data) {
+                    response($.map(data, function (el) {
+                     return {
+                        label: el.name,
+                        value: el.name,
+                        ci: el.ci,
+                        cc: el.cc,
+                        di: el.di,
+                        dn: el.dn,
+                        p: el.p
+                    };
+                }));
+                }
+            });
+        },
+        select: function(event, ui) {
+            $(this).val(ui.item.label);
+            $(this).attr('data-ci', ui.item.ci);
+            $(this).attr('data-cc', ui.item.cc);
+            $(this).attr('data-di', ui.item.di);
+            $(this).attr('data-dn', ui.item.dn);
+            $(this).attr('data-p', ui.item.p);
+            return false;
+        }
+    });
+}
+
+// Get Nationality list for the relevent field in the widget
+function getTravPaxNationalities() {
+    var nat_opt = "";
+
+    $.ajax({ 
+        url: ajaxurl, 
+        type: "POST",
+        data: {
+            action: 'json_travpax_nationalities',
+        },
+        success: function (data) {
+            var nat_string = data.replace('var dataNationalities = ','');
+            nat_string = nat_string.replace(';','');
+            nat_obj = $.parseJSON(nat_string);
+            $.each(nat_obj, function(i, item) {
+                nat_opt += '<option value="'+item.Id+'">'+item.Name+'</option>';
+            });
+            $("#hotel-nationality, #pack-nationality").append(nat_opt);
+        }
+    });
+}
+
+function jsonTravPaxAutoCities(citi_field_id, loc_type_field_id, loc_field_id, opt_text){
+    $(citi_field_id).change(function(event) {
+
+        $(loc_field_id).attr("disabled", "disabled");
+        $(loc_field_id +' option[value!=""]').remove();
+        $(loc_field_id).find('option[value=""]').text('Loading...');
+
+        var city_id = $(this).val();
+        var city_name = $(citi_field_id +" option:selected").text();
+
+        var loc_type = $(loc_type_field_id).val();
+        if(loc_type == "") {
+            loc_type = "2";
+        }
+
+        if (city_id != "") {
+            var hotel_opt = '';
+            data = {
+                action: 'json_travpax_sl_hotels',
+                city: city_id,
+                loc_type: loc_type
+            };
+            $.post( ajaxurl, data, function( response ) {
+                hotel_data = $.parseJSON(response);
+
+                $.each(hotel_data, function(i, item) {
+                    if(item.hotelname != "") {
+                        hotel_opt += '<option value="'+item.VALUE+'">'+item.TEXT+'</option>';
+                    }
+                });
+                $(loc_field_id).append(hotel_opt);
+                $(loc_field_id).removeAttr("disabled");
+                $(loc_field_id).find('option[value=""]').text(opt_text);
+            });
+        }
+    });
+
+    $(loc_type_field_id).change(function(event) {
+
+        $(loc_field_id).attr("disabled", "disabled");
+        $(loc_field_id +' option[value!=""]').remove();
+        $(loc_field_id).find('option[value=""]').text('Loading...');
+
+        var city_id = $(citi_field_id).val();
+        var city_name = $(citi_field_id +" option:selected").text();
+        var loc_type = $(loc_type_field_id).val();
+
+        if (city_id != "" && loc_type != "") {
+            var hotel_opt = '';
+            data = {
+                action: 'json_travpax_sl_hotels',
+                city: city_id,
+                loc_type: loc_type
+            };
+            $.post( ajaxurl, data, function( response ) {
+                hotel_data = $.parseJSON(response);
+
+                $.each(hotel_data, function(i, item) {
+                    if(item.hotelname != "") {
+                        hotel_opt += '<option value="'+item.VALUE+'">'+item.TEXT+'</option>';
+                    }
+                });
+                $(loc_field_id).append(hotel_opt);
+                $(loc_field_id).removeAttr("disabled");
+                $(loc_field_id).find('option[value=""]').text(opt_text);
+            });
+        }
+    });
+}
+
+function jsonTravPaxSLCities() {
+    var city_opt = '';
+
+    data = {
+        action: 'json_travpax_sl_cities',
+    };
+
+    // Get All Sri Lankan Cities
+    $.post( ajaxurl, data, function( response ) {
+        var cities_obj = response;
+        city_data = $.parseJSON(cities_obj);
+        $.each(city_data, function(i, item) {
+            city_opt += '<option value="'+item.ID+'">'+item.NAME+'</option>';
+        });
+        $("#pick-city, #drop_city").append(city_opt);
+    });
+
+    // Limit to selected Sri Lankan Cities
+    var city_opt_ltd = ''; 
+    var sel_sl_cities = {"1562":"Colombo", "8461":"Yala", "41938":"Mirissa", "8308":"Dambulla", "14607":"Trincomalee" };
+    $.each( sel_sl_cities, function( key, value ) {
+        city_opt_ltd += '<option value="'+key+'">'+value+'</option>';
+    });
+    $("#tour-city").append(city_opt_ltd);
+}
+
+function trasfersWidgetFiels() {
+    var trans_type = $('input[name=transfer]:checked').val();
+
+    if(trans_type == "0") {
+        $('#pick-city, #pick-type, #pick-loc').parent().hide();
+    }
+
+    $('input:radio[name="transfer"]').change(
+        function(){
+            if ($(this).is(':checked')){
+                trans_type = $(this).val(); 
+                if(trans_type == "0") {
+                    $("#trans-date, #pick-time").val("");
+                    $("#pick-city, #pick-type, #pick-loc, #drop_city, #drop-type, #drop_loc").find('option').removeAttr("selected");
+                    $("#transfers .people").text('Travelers');
+                    $("#transfers .inputholder:hidden").show();
+                    $(".peoplewrap").css({display: 'none'});
+                    $('#pick-city, #pick-type, #pick-loc').parent().hide();
+                } else if(trans_type == "1") {
+                    $("#trans-date, #pick-time").val("");
+                    $("#pick-city, #pick-type, #pick-loc, #drop_city, #drop-type, #drop_loc").find('option').removeAttr("selected");
+                    $("#transfers .people").text('Travelers');
+                    $('#transfers .inputholder:hidden').show();
+                    $(".peoplewrap").css({display: 'none'});
+                    $('#drop-type, #drop_city, #drop_loc').parent().hide();
+                } else if(trans_type == "2") {
+                    $("#trans-date, #pick-time").val("");
+                    $("#pick-city, #pick-type, #pick-loc, #drop_city, #drop-type, #drop_loc").find('option').removeAttr("selected");
+                    $("#transfers .people").text('Travelers');
+                    $('#transfers .inputholder:hidden').show();
+                    $(".peoplewrap").css({display: 'none'});
+                }
+            }
+        });
+}
+
+// Hotel Search Tab Submission
+function hotelSearch(){
+
+    $("#hotels input, #hotels select").focus(function() {
+       $(this).removeAttr("style");
+   });
+
+    $("#hotel-submit-btn").click(function(e) {
+
+        var _hotCheckIn  = $("#hotel-checkin").val().trim();
+        var hotCheckIn   = _hotCheckIn.split("-").reverse().join("-");
+        var _hotCheckOut = $("#hotel-checkout").val().trim();
+        var hotCheckOut  = _hotCheckOut.split("-").reverse().join("-");
+        var nights       = $("#param_ibe_nights").val();
+        var hotDest      = $("#hotel-destination").val().trim();
+        var hotNation    = $("#hotel-nationality").val();
+
+        var hotLabel    = hotDest
+        var hotCi       = $("#hotel-destination").attr("data-ci");
+        var hotCc       = $("#hotel-destination").attr("data-cc");
+
+        // Get Adults and Children
+        var adultChildArr = [];
+
+        $('#hotel-peoplewrap input.hotel-adult').each(function() {
+            var type = $(this).attr("type");
+            if ((type == "text")) {
+                if ( $(this).val() != "0" ) {
+
+                    adultChildArr.push({
+                        adult: $(this).val(),
+                        child: $(this).parent().parent().next().find(".hotel-child").val()
+                    });
+                }
+            }
+        });
+
+        // Validation
+        
+        var error = 0;
+
+        if(hotCheckIn == "") {
+           error += 1;
+           $("#hotel-checkin").css({
+               background: '#A94442'
+           }); 
+       }
+       if(hotCheckOut == "") {
+           error += 1;
+           $("#hotel-checkout").css({
+               background: '#A94442'
+           }); 
+       }
+       if(hotDest == "") {
+           error += 1;
+           $("#hotel-destination").css({
+               background: '#A94442'
+           }); 
+       }
+       if(hotNation == "") {
+           error += 1;
+           $("#hotel-nationality").css({
+               background: '#A94442'
+           }); 
+       }
+
+       if(error > 0) {
+        e.preventDefault();
+        return false;
+    } else {
+        var pHotel = { 
+            "city":{ 
+             "name": hotDest
+         },
+         "city":{ 
+             "ci": hotCi,
+             "cc": hotCc,
+             "label": hotLabel,
+             "name": hotDest
+         },
+         "checkIn":hotCheckIn,
+         "checkOut":hotCheckOut,
+         "night":nights,
+         "nationalId":hotNation,
+         "rooms":adultChildArr
+     };
+     document.getElementById("jsonStrHotel").value=JSON.stringify(pHotel); 
+ }
+});
+}
+
+
+function tourSearch(){
+
+    $("#tours input, #tours select").focus(function() {
+       $(this).removeAttr("style");
+   });
+
+    $("#tour-submit-btn").click(function(e) {
+       var city_code   = $("#tour-city").val();
+       var _start_date  = $("#tour-start-date").val();
+       var start_date   = _start_date.split("-").reverse().join("-");
+       var tour_adult  = $("#tour-adult").val();
+       var tour_child  = $("#tour-child").val();
+
+       var tour_adult_num = parseInt(tour_adult);
+
+       // Validation
+       
+       var error = 0;
+
+       if(city_code == "") {
+          error += 1;
+          $("#tour-city").css({
+              background: '#A94442'
+          }); 
+      }
+      if(start_date == "") {
+          error += 1;
+          $("#tour-start-date").css({
+              background: '#A94442'
+          }); 
+      }
+
+      if(error > 0) {
+       e.preventDefault();
+       return false;
+   } else {
+    var param = {
+        nationalityCode: "91",
+        countryCode: "LK", 
+        cityCode: city_code,
+        startDate: start_date,
+        adult: tour_adult_num,
+        child: tour_child,
+        paxConcat:"1|0|0|0|0|"
+    };
+    document.getElementById("jsonStrTour").value=JSON.stringify(param); 
+}
+});
+}
+
+
+function transferSearch(){
+
+    $("#transfers input, #transfers select").focus(function() {
+       $(this).removeAttr("style");
+   });
+
+    $("#trans-submit-btn").click(function(e){
+
+        var trans_type      = $('input[name=transfer]:checked').val();
+        var trans_date      = $("#trans-date").val();
+        var new_trans_date  = trans_date.split("-").reverse().join("-");
+        var pick_time       = $("#pick-time").val().trim();
+        var pick_city       = $("#pick-city").val();
+        var pick_type       = $("#pick-type").val();
+        var pick_loc        = $("#pick-loc").val();
+        var drop_city       = $("#drop_city").val();
+        var drop_type       = $("#drop-type").val();
+        var drop_loc        = $("#drop_loc").val();
+        var trans_adult     = $("#trans-adult").val();
+        var trans_child     = $("#trans-child").val();
+
+        // Arrival section
+
+        if ( trans_type == 0 ) {
+
+            var error = 0;
+
+            if(trans_date == "") {
+                error += 1;
+                $("#trans-date").css({
+                    background: '#A94442'
+                }); 
+            }
+            if(pick_time == "") {
+                error += 1;
+                $("#pick-time").css({
+                    background: '#A94442'
+                });
+            }
+            if(drop_city == "") {
+                error += 1;
+                $("#drop_city").css({
+                    background: '#A94442'
+                });
+            }
+            if(drop_type == "") {
+                error += 1;
+                $("#drop-type").css({
+                    background: '#A94442'
+                });
+            }
+            if(drop_loc == "") {
+                error += 1;
+                $("#drop_loc").css({
+                    background: '#A94442'
+                });
+            }
+
+            if(error > 0) {
+                e.preventDefault();
+                return false;
+            } else {
+                var param = {
+                    "Adult":trans_adult,
+                    "Child":trans_child,
+                    "ChildAge":"12",
+                    "TransferType":1,   
+                    "CountryFrom":"LK",                 
+                    "From_City_Id":1562,
+                    "fromAirport":"CMB",
+                    "fromHotel":"",
+                    "fromOtherLocation":"",
+                    "NumberOfBagg":2,
+                    "PickupDate":new_trans_date,
+                    "PickupTime":pick_time,
+                    "ReturnPickupDate":"",
+                    "ReturnPickupTime":"",
+                    "CountryTo":"LK",
+                    "To_City_Id":drop_city,
+                    "toAirport":"",
+                    "toHotel":drop_loc,
+                    "toOtherLocation":1,
+
+                    "PickUpKey":"CMB",
+                    "DropOffKey":drop_loc,                                          
+                    "NATIONALITY_ID":"91",
+                }
+                document.getElementById("jsonStrTransfer").value=JSON.stringify(param);
+            }
+            
+
+        } else if( trans_type == 1 ) {
+
+            var error = 0;
+
+            if(trans_date == "") {
+                error += 1;
+                $("#trans-date").css({
+                    background: '#A94442'
+                }); 
+            }
+            if(pick_time == "") {
+                error += 1;
+                $("#pick-time").css({
+                    background: '#A94442'
+                });
+            }
+            if(pick_city == "") {
+                error += 1;
+                $("#pick-city").css({
+                    background: '#A94442'
+                });
+            }
+            if(pick_type == "") {
+                error += 1;
+                $("#pick-type").css({
+                    background: '#A94442'
+                });
+            }
+            if(pick_loc == "") {
+                error += 1;
+                $("#pick-loc").css({
+                    background: '#A94442'
+                });
+            }
+
+            if(error > 0) {
+                e.preventDefault();
+                return false;
+            } else {
+                var param = {
+                    "Adult":trans_adult,
+                    "Child":trans_child,
+                    "ChildAge":"12",
+                    "TransferType":2,   
+                    "CountryFrom":"LK",                 
+                    "From_City_Id":pick_city,
+                    "fromAirport":"",
+                    "fromHotel":pick_loc,
+                    "fromOtherLocation":"",
+                    "NumberOfBagg":2,
+                    "PickupDate":new_trans_date,
+                    "PickupTime":pick_time,
+                    "ReturnPickupDate":"",
+                    "ReturnPickupTime":"",
+                    "CountryTo":"LK",
+                    "To_City_Id":1562,
+                    "toAirport":"CMB",
+                    //"toHotel":"",
+                    //"toOtherLocation":"",
+
+                    "PickUpKey":pick_loc,
+                    "DropOffKey":1562,                                          
+                    "NATIONALITY_ID":"91",
+                }
+                document.getElementById("jsonStrTransfer").value=JSON.stringify(param);
+            }
+
+        } else if ( trans_type == 2 ) {
+
+            var error = 0;
+
+            if(trans_date == "") {
+                error += 1;
+                $("#trans-date").css({
+                    background: '#A94442'
+                }); 
+            }
+            if(pick_time == "") {
+                error += 1;
+                $("#pick-time").css({
+                    background: '#A94442'
+                });
+            }
+            if(pick_city == "") {
+                error += 1;
+                $("#pick-city").css({
+                    background: '#A94442'
+                });
+            }
+            if(pick_type == "") {
+                error += 1;
+                $("#pick-type").css({
+                    background: '#A94442'
+                });
+            }
+            if(pick_loc == "") {
+                error += 1;
+                $("#pick-loc").css({
+                    background: '#A94442'
+                });
+            }
+            if(drop_city == "") {
+                error += 1;
+                $("#drop_city").css({
+                    background: '#A94442'
+                });
+            }
+            if(drop_type == "") {
+                error += 1;
+                $("#drop-type").css({
+                    background: '#A94442'
+                });
+            }
+            if(drop_loc == "") {
+                error += 1;
+                $("#drop_loc").css({
+                    background: '#A94442'
+                });
+            }
+
+            if(error > 0) {
+                e.preventDefault();
+                return false;
+            } else {
+                var param = {
+                    "Adult":trans_adult,
+                    "Child":trans_child,
+                    "ChildAge":"12",
+                    "TransferType":3,   
+                    "CountryFrom":"LK",                 
+                    "From_City_Id":pick_city,
+                    "fromAirport":"",
+                    "fromHotel":pick_loc,
+                    "fromOtherLocation":"",
+                    "NumberOfBagg":2,
+                    "PickupDate":new_trans_date,
+                    "PickupTime":pick_time,
+                    "ReturnPickupDate":"",
+                    "ReturnPickupTime":"",
+                    "CountryTo":"LK",
+                    "To_City_Id":drop_city,
+                    "toAirport":"",
+                    "toHotel":drop_loc,
+                    "toOtherLocation":"",
+
+                    "PickUpKey":pick_loc,
+                    "DropOffKey":drop_loc,                                          
+                    "NATIONALITY_ID":"91",
+                }
+                document.getElementById("jsonStrTransfer").value=JSON.stringify(param);
+            }
+        }
+    });
+}
+
+
+// Package search tab submission
+function packageSearch(){
+
+    $("#package input, #package select").focus(function() {
+       $(this).removeAttr("style");
+   });
+    
+    $("#pack-submit-btn").click(function(e){
+        var packNat     = $("#pack-nationality").val();
+        var _packDate   = $("#pack-date").val().trim();
+        var packDate    = _packDate.split("-").reverse().join("-");
+
+        var packAdult   = $("#pack-adult").val();
+        var packChild   = $("#pack-child").val();
+        var packLabel   = $("#pack-destination").val().trim();
+        var packCi      = $("#pack-destination").attr("data-ci");
+        var packCc      = $("#pack-destination").attr("data-cc");
+        var packDi      = $("#pack-destination").attr("data-di");
+        var packDn      = $("#pack-destination").attr("data-dn");
+        var packP       = $("#pack-destination").attr("data-p");
+
+        var error = 0;
+
+        if(packNat == "") {
+            error += 1;
+            $("#pack-nationality").css({
+                background: '#A94442'
+            });
+        }
+        if(packDate == "") {
+            error += 1;
+            $("#pack-date").css({
+                background: '#A94442'
+            });
+        }
+        if(packLabel == "") {
+            error += 1;
+            $("#pack-destination").css({
+                background: '#A94442'
+            });
+        }
+        if(error > 0) {
+            e.preventDefault();
+            return false;
+        } else {
+            var param = {
+                nationalId: packNat,
+                city:{ 
+                 "ci": packCi,
+                 "cc": packCc,
+                 "di": packDi,
+                 "dn": packDn,
+                 "label": packLabel,
+                 "p": packP
+             },
+             continentid: 'AS', 
+             countryId: 'TH',
+             traveldate: packDate,
+             packagecode:'',
+             packagename:'',
+             adult: packAdult,
+             child: packChild
+         };
+         document.getElementById("jsonStrPackage").value=JSON.stringify(param);
+     }
+ });
+}
+
+
+// Excursion popup submission single
+function excursionPopupSearch() {
+    $("#popup-date-single").focus(function() {
+       $(this).removeAttr("style");
+   });
+    $("#popup-submit-btn-single").on("click", function(e) {
+        var popup_date          = $("#popup-date-single").val();
+        var popup_tour_id       = $("#bn_tour_id").val().trim();
+        var popup_city_id       = $("#bn_city_id").val().trim();
+
+        if(popup_date == "") {
+            e.preventDefault();
+            $("#popup-date-single").css({
+                background: '#A94442'
+            });
+        } else {
+            var popup_date_format   = popup_date.split("-").reverse().join("-");
+            var form_action         = "http://b2cwalkers.travpax.com/Web/SearchExternal/SearchTour/";
+            form_action_param       = "?ServiceId="+popup_tour_id+"&TourDate="+popup_date_format+"&CityId="+popup_city_id;
+            form_action_format      = form_action + form_action_param;
+
+            $("#popup-form-single").attr("action", form_action_format);
+            $("#popup-form-single").submit();
+            $.fancybox.close(); // close fancybox on submit
+        }
+    });
+}
+
+// Excursion popup submission multiple, listing page
+function excursionMultiPopupSearch() {
+    $(".multi_popup_date").focus(function() {
+       $(this).removeAttr("style");
+   });
+    $(".multi_popup_submit").on("click", function(e) {
+        var popup_date          = $(this).parent().parent().find(".multi_popup_date").val();
+        var popup_tour_id       = $(this).parent().parent().find(".bn_tour_id").val();
+        var popup_city_id       = $(this).parent().parent().find(".bn_city_id").val();
+
+        if(popup_date == "") {
+            e.preventDefault();
+            $(".multi_popup_date").css({
+                background: '#A94442'
+            });
+        } else {
+            var popup_date_format   = popup_date.split("-").reverse().join("-");
+            var form_action         = "http://b2cwalkers.travpax.com/Web/SearchExternal/SearchTour/";
+            form_action_param       = "?ServiceId="+popup_tour_id+"&TourDate="+popup_date_format+"&CityId="+popup_city_id;
+            form_action_format      = form_action + form_action_param;
+
+            $(this).parent().parent().attr("action", form_action_format);
+            $(this).parent().parent().submit();
+        }
+    });
+}
+
+/* Added for Facelift ======================================= */
+
+//get width without scrollbars
+function viewport() {
+    var e = window, a = 'inner';
+    if (!('innerWidth' in window )) {
+        a = 'client';
+        e = document.documentElement || document.body;
+    }
+    return { width : e[ a+'Width' ] , height : e[ a+'Height' ] };
+}
+
+function excursionCarousel() {
+   if ($('.excursion-carousel').length > 0) {
+        $('.excursion-carousel').owlCarousel({
+            loop: false,
+            nav:true,
+            autoWidth: true,
+            navText: ['<span class="left"></span>','<span class="right"></span>'],
+            responsive:{
+                768:{
+                    stagePadding: 20,
+                    margin: 0                    
+                },
+                992:{
+                    stagePadding: 20,
+                    margin: 0
+                },
+                1200:{
+                    stagePadding: 20,
+                    margin: 5
+                }
+            }
+        });
+    }
+}
+
+function awardsCarousel() {
+    $('#awards-carousel').owlCarousel({
+        loop:true,
+        margin:10,
+        dots: false,
+        nav: false,
+        responsiveClass:true,
+        responsive:{
+            0:{
+                items:1
+            },
+            768:{
+                items:3
+            },
+            992:{
+                items:3
+            },
+            1200:{
+                items:5
+            }
+        }
+    })
+}
+
+function teamCarousel() {
+    $('.team-images-wrapper').owlCarousel({
+        autoplay: true,
+        loop:true,
+        margin:0,
+        dots: false,
+        nav: false,
+        responsive:{
+            0:{
+                items:2
+            },
+            768:{
+                items:2
+            },
+            992:{
+                items:3
+            },
+            1200:{
+                items:4
+            }
+        }
+    });
+}
+
+function homeVideo() {
+    var vid = document.getElementById("bgvid");
+    // var pauseButton = document.querySelector("button");
+
+    // if (window.matchMedia('(prefers-reduced-motion)').matches) {
+    //     vid.removeAttribute("autoplay");
+    //     vid.pause();
+    //     pauseButton.innerHTML = "Paused";
+    // }
+    function vidFade() {
+      vid.classList.add("stopfade");
+  }
+
+  vid.addEventListener('ended', function()
+  {
+// only functional if "loop" is removed 
+vid.pause();
+// to capture IE10
+vidFade();
+}); 
+
+// can activate pause function if necessary
+// pauseButton.addEventListener("click", function() {
+//   vid.classList.toggle("stopfade");
+//   if (vid.paused) {
+//     vid.play();
+//     pauseButton.innerHTML = "Pause";
+// } else {
+//     vid.pause();
+//     pauseButton.innerHTML = "Paused";
+// }
+// })
+}
+                      
+
+
+
+/* mixitup home page */
+$(function(){
+    $('.mixes-wrapper').mixItUp({
+        load: {
+          filter: '.category-1'
+      }
+  });
+});
+
+$(window).scroll(function(){
+    if($(window).scrollTop() > 195) {
+        $('.header-wrap-main-nav-wrap').addClass("fixedpos");
+    }
+    else{
+     $('.header-wrap-main-nav-wrap').removeClass("fixedpos");
+       // $('.fixed-menu').css('display','none');
+        //$(".form-hloder").removeClass("fixed-right");
+        //$(".book-btn-close").css('display','none');
+    }
+});
+
+function newsletterValidator() {
+    $('#goButId').click(function(e) {
+        // alert('asdasd');
+        e.preventDefault();
+        var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+
+        var email = $("#param_email").val();
+
+        if (email == '') {
+            $('.msgbox_name').html('Enter a valid email').show().fadeIn().delay(5000).fadeOut();
+        } else if (reg.test(email) == false) {
+            $('.msgbox_name').html('Please enter a valid email address').show().fadeIn().delay(5000).fadeOut();
+        } else {
+            data = {
+                action: 'validate_newsletter',
+                value: email
+            };
+            $.post(ajaxurl, data, function(response) {
+                if (response) {
+                    if (response == 1) {
+                        $('.msgbox_name').html('Email Address is already subscribed').show().fadeIn().delay(5000).fadeOut();
+                    } else {
+                        $('#eml_frm').submit();
+                    }
+                } else {
+                    $('.msgbox_name').html('Try again latter').show().fadeIn().delay(5000).fadeOut();
+                }
+            });
+        }
+    });
+}
