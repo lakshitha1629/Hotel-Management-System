@@ -8,9 +8,9 @@ Project Description :- Hotel Wellassa was developed following system development
 
 Main Areas
 
-1.Hotel Wellassa Home Page
-2.Restaurant Details
-3.Hall Booking Details
-4.Room Booking Details
-5.Adventure & Tours
-6.Content
+1.Hotel Wellassa Home Page                                                                                                                 
+2.Restaurant Details                                                                                                                       
+3.Hall Booking Details                                                                                                                     
+4.Room Booking Details                                                                                                                     
+5.Adventure & Tours                                                                                                                       
+6.Content                                                                                                                                           
